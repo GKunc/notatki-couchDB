@@ -1,0 +1,7 @@
+.input-field {
+  margin: 8px;
+}
+
+::ng-deep .mat-form-field {
+  display: block !important;
+}

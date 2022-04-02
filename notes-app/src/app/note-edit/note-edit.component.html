@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>Edit note</h2>
+
+<mat-dialog-content class="mat-typography">
+  <mat-form-field class="title-control" appearance="fill">
+    <mat-label>Title</mat-label>
+    <input matInput placeholder="Title" [formControl]="titleControl" required>
+    <mat-error *ngIf="titleControl.invalid">{{getErrorMessage()}}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="title-control" appearance="fill">
+    <mat-label>Hashtags</mat-label>
+    <mat-chip-list #hashtagList aria-label="Hashtags">
+      <mat-chip *ngFor="let hashtag of note.hashtags"
+               [removable]="true" (removed)="removeHashtag(hashtag)">
+        {{hashtag}}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip>
+      <input placeholder="Add hashtags..."
+             [matChipInputFor]="hashtagList"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             [matChipInputAddOnBlur]="true"
+             (matChipInputTokenEnd)="addHashtag($event)">
+    </mat-chip-list>
+  </mat-form-field>
+
+  <md-editor
+    [class.invalid]="note.content === ''"
+    #md="ngModel" name="Content"
+    [preRender]="preRender" [postRender]="postRender"
+    [(ngModel)]="note.content" [mode]="mode" [options]="options"
+    required height="200px" width="600px" invalid>
+  </md-editor>
+  <mat-error *ngIf="note.content === ''">{{getErrorMessage()}}</mat-error>
+
+  <input type="file" accept="*" multiple>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="addNote()" color="primary" *ngIf="isNewNote" [disabled]="getErrorMessage() !== ''">Add</button>
+  <button mat-raised-button (click)="updateNote()" color="primary" *ngIf="!isNewNote" [disabled]="getErrorMessage() !== ''">Update</button>
+  <button mat-raised-button (click)="closeUpdate()" color="secondary" >Close</button>
+</mat-dialog-actions>

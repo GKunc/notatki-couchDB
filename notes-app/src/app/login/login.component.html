@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Connect to Database</h2>
+<mat-dialog-content class="mat-typography">
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your Login</mat-label>
+    <input matInput placeholder="Login" [formControl]="login" required>
+    <mat-error *ngIf="login.invalid">{{getErrorMessage()}}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your password</mat-label>
+    <input matInput [type]="hidePassword ? 'password' : 'text'" [formControl]="password" required>
+    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+      <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+    <mat-error *ngIf="password.invalid">{{getErrorMessage()}}</mat-error>
+  </mat-form-field>
+
+  </mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="authenticate()" color="primary" [disabled]="getErrorMessage() !== ''" cdkFocusInitial>Log in</button>
+</mat-dialog-actions>

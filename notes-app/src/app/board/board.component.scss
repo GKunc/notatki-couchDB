@@ -1,0 +1,128 @@
+.board-container {
+  display: flex;
+  height: calc(100% - 80px);
+  background-color: white;
+  border-radius: 5px;
+  margin: 24px;
+  padding: 16px;
+}
+
+.board {
+  margin-left: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.spinner-container {
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notes-container {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+
+.add-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.add-button {
+  margin-bottom: 32px;
+}
+
+.colors-container {
+  display: flex;
+  flex-direction: column;
+  animation: fade .5s linear forwards;
+}
+
+.fade {
+  animation: fade-out .5s linear forwards;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.dot {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 8px;
+  cursor: pointer;
+}
+
+.dot-red {
+  background-color: rgb(248, 106, 106);
+}
+
+.dot-green {
+  background-color: rgb(84, 185, 84);
+}
+
+.dot-orange {
+  background-color: rgb(252, 201, 105);
+}
+
+.dot-blue {
+  background-color: rgb(88, 88, 233);
+}
+
+.dot-purple {
+  background-color: rgb(196, 66, 196);
+}
+
+::ng-deep .success-notification {
+  margin-top: 32px !important;
+  color: white !important;
+  background-color: green !important;
+
+  ::ng-deep button {
+    border: 1px solid white;
+    color: white !important;
+  }
+}
+
+::ng-deep .error-notification {
+  margin-top: 32px !important;
+  color: white !important;
+  background-color: red !important;
+
+  ::ng-deep button {
+    border: 1px solid white;
+    color: white !important;
+  }
+}
+
+::ng-deep .cdk-overlay-backdrop {
+  z-index: 1 !important;
+}

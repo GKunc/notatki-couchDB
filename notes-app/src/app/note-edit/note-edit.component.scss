@@ -1,0 +1,9 @@
+.title-control {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+::ng-deep .invalid > div {
+  border: 1px solid red !important;
+  margin: 0 !important;
+}

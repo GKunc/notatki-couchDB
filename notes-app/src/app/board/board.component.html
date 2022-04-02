@@ -1,0 +1,55 @@
+<div style="z-index: 10; height: 100%; width: 100%; background-color: black" *ngIf="!authenticated && loading"></div>
+
+<div class="board-container">
+  <div class="add-panel">
+    <button class="add-button" mat-fab color="primary" aria-label="Add note">
+      <mat-icon>add</mat-icon>
+    </button>
+
+      <div class="colors-container">
+        <span class="dot dot-red" (click)="createNote('red')"></span>
+        <span class="dot dot-green" (click)="createNote('green')"></span>
+        <span class="dot dot-orange" (click)="createNote('orange')"></span>
+        <span class="dot dot-purple" (click)="createNote('purple')"></span>
+        <span class="dot dot-blue" (click)="createNote('blue')"></span>
+      </div>
+  </div>
+  <mat-divider [vertical]="true"></mat-divider>
+
+  <div class="board">
+    <mat-form-field class="title-control" appearance="fill">
+      <mat-label>Filters</mat-label>
+      <mat-chip-list #filterList aria-label="Hashtags">
+        <mat-chip *ngFor="let filter of filterTags"
+                 [removable]="true" (removed)="removeFilter(filter)">
+          {{filter}}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <input placeholder="Add filters..."
+               [matChipInputFor]="filterList"
+               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+               [matChipInputAddOnBlur]="true"
+               (matChipInputTokenEnd)="addFilter($event)">
+      </mat-chip-list>
+    </mat-form-field>
+
+    <h1>Notes</h1>
+    <div class="spinner-container" *ngIf="authenticated && loading">
+      <mat-spinner></mat-spinner>
+    </div>
+
+    <div class="notes-container" *ngIf="!loading">
+      <note *ngFor="let note of filteredNotes"
+        [id]="note.id"
+        [title]="note.title"
+        [content]="note.content"
+        [date]="note.date"
+        [favourite]="note.favourite"
+        [color]="note.color"
+        [attachments]="note.attachments"
+        [hashtags]="note.hashtags"></note>
+    </div>
+  </div>
+</div>

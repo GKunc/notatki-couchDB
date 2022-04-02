@@ -1,0 +1,54 @@
+<div style="position: relative;">
+  <div class="close-button">
+    <button (click)="deleteNote()" class="add-button" mat-mini-fab aria-label="Delete note">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div [ngClass]="['note', class]">
+    <div class="note-title">
+      <input [title]="title" type="text" [(ngModel)]="title" class="editable" disabled>
+      <mat-icon (click)="toggleFavourite()" class="favourite-icon" [style.color]="getFavouriteStyle()">
+        star
+      </mat-icon>
+    </div>
+
+    <div class="note-content">
+      <markdown [data]="content"></markdown>
+    </div>
+
+    <mat-expansion-panel *ngIf="attachments.length > 0">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-label>Attachments</mat-label>
+        </mat-panel-title>
+        <mat-panel-description>
+          {{ attachments.length }}
+          <mat-icon>attach_file</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <mat-chip-list aria-label="Attachments" *ngIf="attachments.length > 0" style="display: flex; flex-direction: column">
+        <mat-chip
+          class="long-text"
+          *ngFor="let attachment of attachments"
+          [removable]="true"
+          (click)="downloadAttachment($event)"
+          (removed)="removeAttachment(attachment)">
+          {{ attachment.fileName }}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      </mat-chip-list>
+    </mat-expansion-panel>
+
+
+    <div class="note-footer">
+      {{ date | date }}
+      <button (click)="updateNote()" class="edit-button" mat-mini-fab color="black" aria-label="Edit note">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
