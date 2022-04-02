@@ -51,6 +51,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'Notatki'
-          slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_261280AE6BF64B5CBBA614E5BC604C7C }}
-          package: .
+          package: ./dist/node-app
