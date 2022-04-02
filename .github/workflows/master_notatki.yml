@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: notes-app/dist/
+          path: notes-app/dist
 
   deploy:
     runs-on: ubuntu-latest
@@ -52,4 +52,4 @@ jobs:
         with:
           app-name: 'Notatki'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_261280AE6BF64B5CBBA614E5BC604C7C }}
-          package: .
+          package: notes-app/dist
