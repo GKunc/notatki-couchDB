@@ -52,4 +52,4 @@ jobs:
         with:
           app-name: 'Notatki'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_261280AE6BF64B5CBBA614E5BC604C7C }}
-          package: ./dist/node-app
+          package: ./dist/notes-app
