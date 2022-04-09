@@ -4,6 +4,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { CouchDbWrapperService } from '../services/coach-db-wrapper.service';
+import { CosmosClient } from '@azure/cosmos';
+import sha256 from 'crypto-js/sha256';
 
 @Component({
   selector: 'login',
@@ -25,30 +27,45 @@ export class LoginComponent implements OnInit {
     this.dialogRef.disableClose = true;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   async authenticate(): Promise<void> {
-    this.couchDbService
-      .verifyConnection(this.login.value, this.password.value)
-      .then(() =>
-        this.couchDbService.connectToRemoteDb(
-          this.login.value,
-          this.password.value
-        )
-      )
-      .then(() => {
-        document.cookie = 'Authenticated=true';
-        document.cookie = `Login=${this.login.value}`;
-        document.cookie = `Password=${this.password.value}`;
-        this.dialogRef.close(true);
+    const config = require('../../../config')
+
+    const endpoint = config.endpoint
+    const key = config.key
+
+    const databaseId = config.database.id
+    const containerId = config.usersContainer.id
+
+    const options = {
+      endpoint: endpoint,
+      key: key,
+      userAgentSuffix: 'CosmosDBJavascriptQuickstart'
+    };
+
+    const client = new CosmosClient(options)
+
+    const modalConfig: MatSnackBarConfig = {
+      duration: 3000,
+      verticalPosition: 'top',
+      panelClass: ['error-notification'],
+    };
+
+    this.createDatabase(client, databaseId)
+      .then(async () => {
+        const hasAccess = await this.findUserInDb(client, databaseId, containerId)
+        if (hasAccess) {
+          document.cookie = 'Authenticated=true';
+          document.cookie = `Login=${this.login.value}`;
+          document.cookie = `Password=${this.password.value}`;
+          this.dialogRef.close(true);
+        } else {
+          this.snackBar.open('Login or password is invalid!', 'Dismiss', modalConfig);
+        }
       })
       .catch(() => {
-        const config: MatSnackBarConfig = {
-          duration: 3000,
-          verticalPosition: 'top',
-          panelClass: ['error-notification'],
-        };
-        this.snackBar.open('Login or password is invalid!', 'Dismiss', config);
+        this.snackBar.open('Login or password is invalid!', 'Dismiss', modalConfig);
       });
   }
 
@@ -57,5 +74,32 @@ export class LoginComponent implements OnInit {
       return 'You must enter a value';
     }
     return '';
+  }
+
+  async createDatabase(client: CosmosClient, databaseId: string) {
+    const { database } = await client.databases.createIfNotExists({
+      id: databaseId
+    })
+    console.log(`Created database:\n${database.id}\n`)
+  }
+
+
+  async findUserInDb(client: CosmosClient, databaseId: string, containerId: string): Promise<boolean> {
+    const { database } = await client.databases.createIfNotExists({
+      id: databaseId
+    })
+    const container = database.container(containerId);
+
+    const querySpec = {
+      query: `SELECT * FROM c`
+    };
+
+    const { resources: items } = await container.items
+      .query(querySpec)
+      .fetchAll();
+
+    if (items[0].password.toString() === sha256(this.password.value).toString())
+      return true;
+    return false;
   }
 }
