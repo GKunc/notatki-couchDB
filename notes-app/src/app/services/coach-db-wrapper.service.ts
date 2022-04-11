@@ -11,7 +11,7 @@ export class CouchDbWrapperService implements OnDestroy {
   private serverDb: PouchDB.Database | null = null;
   private syncHandler: PouchDB.Replication.Sync<{}> | null = null;
   private changesListeners: { [key: string]: () => Promise<void> } = {};
-  constructor(private cookieService: CookieService) {}
+  constructor(private cookieService: CookieService) { }
 
   listenOnChanges(subName: string, listener: () => Promise<void>) {
     this.changesListeners[subName] = listener;
@@ -51,6 +51,7 @@ export class CouchDbWrapperService implements OnDestroy {
   }
 
   public connectToRemoteDb(login: string, password: string): any {
+
     this.serverDb = new PouchDB(COUCHDB_DATABASE_LOCAL_URL, {
       auth: {
         username: login,

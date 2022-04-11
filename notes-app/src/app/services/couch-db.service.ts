@@ -8,6 +8,7 @@ import {
 } from 'src/models/note';
 import { CouchDbWrapperService } from './coach-db-wrapper.service';
 import { CosmosClient } from '@azure/cosmos';
+import { CosmosDbService } from './cosmos-db.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +28,17 @@ export class CouchDbService {
   }
 
   async getAllNotes(): Promise<Note[]> {
+    const cosmosDB = new CosmosDbService();
+    const container = await cosmosDB.getCosmosContainer()
+    const query = 'SELECT * FROM c'
+
+    const { resources: results } = await container.items.query(query).fetchAll()
+
+    for (var queryResult of results) {
+      let resultString = JSON.stringify(queryResult)
+      console.log(`\tQuery returned ${resultString}\n`)
+    }
+
     const db = this.newService.getDatabase();
     let notes: Note[] = [];
     const result = await db.allDocs<Note>();
@@ -52,25 +64,7 @@ export class CouchDbService {
   }
 
   async createNote(note: Note): Promise<void> {
-    const config = require('../../../config')
-    const endpoint = config.endpoint
-    const key = config.key
 
-    const databaseId = config.database.id
-    const containerId = config.usersContainer.id
-
-    const options = {
-      endpoint: endpoint,
-      key: key,
-      userAgentSuffix: 'CosmosDBJavascriptQuickstart'
-    };
-
-    const client = new CosmosClient(options)
-
-    const { item } = await client
-      .database(databaseId)
-      .container(containerId)
-      .items.upsert(note)
 
     // const db = this.newService.getDatabase();
     // const noteToCreate = createNoteCouchDBFromModel(note);
