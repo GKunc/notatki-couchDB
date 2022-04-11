@@ -32,43 +32,44 @@ export class CouchDbService {
     const container = await cosmosDB.getCosmosContainer()
     const query = 'SELECT * FROM c'
 
-    const { resources: results } = await container.items.query(query).fetchAll()
-
-    for (var queryResult of results) {
-      let resultString = JSON.stringify(queryResult)
-      console.log(`\tQuery returned ${resultString}\n`)
-    }
-
-    const db = this.newService.getDatabase();
+    const { resources: items } = await container.items.query(query).fetchAll();
     let notes: Note[] = [];
-    const result = await db.allDocs<Note>();
-    const noteIds =
-      result?.rows.map((row) => {
-        return row.id;
-      }) ?? [];
-    for (let i = 0; i < noteIds.length; i++) {
-      const noteId = noteIds[i];
-      const noteDB = await db.get<Note>(noteId, {
-        attachments: true,
-        binary: true,
-      });
-      const note = createNoteModelFromCouchDB(noteDB);
-      if (noteDB?._attachments) {
-        note.attachments = await this.getAttachments(noteDB?._attachments);
-      }
-      notes.push(note);
-    }
+
+    items.forEach(item => {
+      const note = createNoteModelFromCouchDB(item);
+      notes.push(note)
+    });
+
+    // const db = this.newService.getDatabase();
+    // let notes: Note[] = [];
+    // const result = await db.allDocs<Note>();
+    // const noteIds =
+    //   result?.rows.map((row) => {
+    //     return row.id;
+    //   }) ?? [];
+    // for (let i = 0; i < noteIds.length; i++) {
+    //   const noteId = noteIds[i];
+    //   const noteDB = await db.get<Note>(noteId, {
+    //     attachments: true,
+    //     binary: true
+    //   });
+    //   const note = createNoteModelFromCouchDB(noteDB);
+    //   if (noteDB?._attachments) {
+    //     note.attachments = await this.getAttachments(noteDB?._attachments);
+    //   }
+    //   notes.push(note);
+    // }
     this.notes = notes;
     this._notes$.next(this.notes as Note[]);
     return notes;
   }
 
   async createNote(note: Note): Promise<void> {
+    const cosmosDB = new CosmosDbService();
+    const container = await cosmosDB.getCosmosContainer()
 
+    container.items.create(note);
 
-    // const db = this.newService.getDatabase();
-    // const noteToCreate = createNoteCouchDBFromModel(note);
-    // await db.put(noteToCreate);
     // await this.addAttachments(note);
     this.notes.push(note);
     this._notes$.next(this.notes as Note[]);
