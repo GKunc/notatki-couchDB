@@ -7,6 +7,7 @@ import {
   Note,
 } from 'src/models/note';
 import { CouchDbWrapperService } from './coach-db-wrapper.service';
+import { CosmosClient } from '@azure/cosmos';
 
 @Injectable({
   providedIn: 'root',
@@ -37,7 +38,7 @@ export class CouchDbService {
       const noteId = noteIds[i];
       const noteDB = await db.get<Note>(noteId, {
         attachments: true,
-        binary: true,        
+        binary: true,
       });
       const note = createNoteModelFromCouchDB(noteDB);
       if (noteDB?._attachments) {
@@ -51,10 +52,30 @@ export class CouchDbService {
   }
 
   async createNote(note: Note): Promise<void> {
-    const db = this.newService.getDatabase();
-    const noteToCreate = createNoteCouchDBFromModel(note);
-    await db.put(noteToCreate);
-    await this.addAttachments(note);
+    const config = require('../../../config')
+    const endpoint = config.endpoint
+    const key = config.key
+
+    const databaseId = config.database.id
+    const containerId = config.usersContainer.id
+
+    const options = {
+      endpoint: endpoint,
+      key: key,
+      userAgentSuffix: 'CosmosDBJavascriptQuickstart'
+    };
+
+    const client = new CosmosClient(options)
+
+    const { item } = await client
+      .database(databaseId)
+      .container(containerId)
+      .items.upsert(note)
+
+    // const db = this.newService.getDatabase();
+    // const noteToCreate = createNoteCouchDBFromModel(note);
+    // await db.put(noteToCreate);
+    // await this.addAttachments(note);
     this.notes.push(note);
     this._notes$.next(this.notes as Note[]);
   }
