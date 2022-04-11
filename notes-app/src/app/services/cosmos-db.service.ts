@@ -23,7 +23,7 @@ export class CosmosDbService {
 
         return client
             .database(databaseId)
-            .container(containerId)
+            .container(containerId);
     }
 }
 

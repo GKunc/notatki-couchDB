@@ -23,7 +23,7 @@ export class NoteComponent implements OnInit {
   class: string = '';
   dialogRef: MatDialogRef<NoteEditComponent> | undefined;
 
-  constructor(public couchDb: CouchDbService, public dialog: MatDialog) {}
+  constructor(public couchDb: CouchDbService, public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.class = `note-${this.color}`;
@@ -37,7 +37,7 @@ export class NoteComponent implements OnInit {
   }
 
   getFavouriteStyle(): string {
-    if(this.favourite) return 'yellow';
+    if (this.favourite) return 'yellow';
     return 'white'
   }
 
@@ -59,7 +59,7 @@ export class NoteComponent implements OnInit {
 
   downloadAttachment(event: any): void {
     const clickedAttachment = this.attachments.find(attachment => attachment.fileName === (event.target.innerText as string).split(/\r\n|\n\r|\n|\r/)[0]);
-    if(clickedAttachment) {
+    if (clickedAttachment) {
       const data = clickedAttachment?.content;
       const fileName = clickedAttachment?.fileName;
       const a = document.createElement('a');

@@ -29,7 +29,8 @@ export class CouchDbService {
 
   async getAllNotes(): Promise<Note[]> {
     const cosmosDB = new CosmosDbService();
-    const container = await cosmosDB.getCosmosContainer()
+    const container = await cosmosDB.getCosmosContainer();
+
     const query = 'SELECT * FROM c'
 
     const { resources: items } = await container.items.query(query).fetchAll();
@@ -69,29 +70,33 @@ export class CouchDbService {
     const container = await cosmosDB.getCosmosContainer()
 
     container.items.create(note);
-
+    console.log(note)
     // await this.addAttachments(note);
     this.notes.push(note);
     this._notes$.next(this.notes as Note[]);
   }
 
   async deleteNote(noteId: string): Promise<void> {
-    const db = this.newService.getDatabase();
-    const noteToDelete = await db.get(noteId);
-    if (noteToDelete) {
-      db.remove(noteToDelete);
-      this.notes = this.notes.filter((note) => note.id != noteId);
-      this._notes$.next(this.notes as Note[]);
-    }
+    const cosmosDB = new CosmosDbService();
+    const container = await cosmosDB.getCosmosContainer()
+    await container.item(noteId, noteId).delete();
+
+    this.notes = this.notes.filter((note) => note.id != noteId);
+    this._notes$.next(this.notes as Note[]);
   }
 
   async updateNote(note: Note): Promise<void> {
-    const db = this.newService.getDatabase();
-    const noteFromCouchDB = await db.get(note.id);
-    let noteToUpdate = createNoteCouchDBFromModel(note);
-    noteToUpdate._rev = noteFromCouchDB?._rev;
-    await db.put(noteToUpdate);
-    await this.addAttachments(note);
+    // const db = this.newService.getDatabase();
+    // const noteFromCouchDB = await db.get(note.id);
+    // let noteToUpdate = createNoteCouchDBFromModel(note);
+    // noteToUpdate._rev = noteFromCouchDB?._rev;
+    // await db.put(noteToUpdate);
+    // await this.addAttachments(note);
+    const cosmosDB = new CosmosDbService();
+    const container = await cosmosDB.getCosmosContainer()
+
+    container.item(note.id, note.id).replace(note);
+
     const found = this.notes.find((noteN) => noteN.id === note.id);
     const index = this.notes.findIndex((noteN) => noteN === found);
     if (index !== -1) this.notes[index] = note;

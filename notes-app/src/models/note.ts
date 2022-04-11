@@ -14,7 +14,7 @@ export class Note {
 
 export function createNoteModelFromCouchDB(note: Note & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta | undefined): Note {
   return {
-    id: note?._id ?? 'empty',
+    id: note?.id ?? 'empty',
     title: note?.title ?? '',
     content: note?.content ?? '',
     date: note?.date ?? new Date(),
@@ -27,7 +27,7 @@ export function createNoteModelFromCouchDB(note: Note & PouchDB.Core.IdMeta & Po
 
 export function createNoteCouchDBFromModel(note: Note): any {
   return {
-    "_id": note?.id ?? 'empty',
+    "id": note?.id ?? 'empty',
     "title": note?.title ?? '',
     "content": note?.content ?? '',
     "date": note?.date ?? new Date(),

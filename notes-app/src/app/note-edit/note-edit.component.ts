@@ -27,7 +27,7 @@ export class NoteEditComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NoteEditComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { note: Note, isNewNote: boolean},
+    @Inject(MAT_DIALOG_DATA) public data: { note: Note, isNewNote: boolean },
     public couchDb: CouchDbService
   ) {
     this.note = data.note;
