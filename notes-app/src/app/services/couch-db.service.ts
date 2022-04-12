@@ -28,19 +28,6 @@ export class CouchDbService {
   }
 
   async getAllNotes(): Promise<Note[]> {
-    const cosmosDB = new CosmosDbService();
-    const container = await cosmosDB.getCosmosContainer();
-
-    const query = 'SELECT * FROM c'
-
-    const { resources: items } = await container.items.query(query).fetchAll();
-    let notes: Note[] = [];
-
-    items.forEach(item => {
-      const note = createNoteModelFromCouchDB(item);
-      notes.push(note)
-    });
-
     // const db = this.newService.getDatabase();
     // let notes: Note[] = [];
     // const result = await db.allDocs<Note>();
@@ -60,47 +47,58 @@ export class CouchDbService {
     //   }
     //   notes.push(note);
     // }
-    this.notes = notes;
+
+    // Cosmos
+    const cosmosDB = new CosmosDbService();
+    const items = await cosmosDB.getAllNotes();
+
+    this.notes = items;
     this._notes$.next(this.notes as Note[]);
-    return notes;
+    return this.notes;
   }
 
   async createNote(note: Note): Promise<void> {
-    const cosmosDB = new CosmosDbService();
-    const container = await cosmosDB.getCosmosContainer()
-
-    container.items.create(note);
-    console.log(note)
-    // await this.addAttachments(note);
+    const db = this.newService.getDatabase();
+    const noteToCreate = createNoteCouchDBFromModel(note);
+    await db.put(noteToCreate);
+    await this.addAttachments(note);
     this.notes.push(note);
     this._notes$.next(this.notes as Note[]);
+
+    // Cosmos
+    const cosmosDB = new CosmosDbService();
+    cosmosDB.createNote(note);
   }
 
   async deleteNote(noteId: string): Promise<void> {
-    const cosmosDB = new CosmosDbService();
-    const container = await cosmosDB.getCosmosContainer()
-    await container.item(noteId, noteId).delete();
+    const db = this.newService.getDatabase();
+    const noteToDelete = await db.get(noteId);
+    if (noteToDelete) {
+      db.remove(noteToDelete);
+      this.notes = this.notes.filter((note) => note.id != noteId);
+      this._notes$.next(this.notes as Note[]);
+    }
 
-    this.notes = this.notes.filter((note) => note.id != noteId);
-    this._notes$.next(this.notes as Note[]);
+    // Cosmos
+    const cosmosService = new CosmosDbService();
+    cosmosService.deleteNote(noteId);
   }
 
   async updateNote(note: Note): Promise<void> {
-    // const db = this.newService.getDatabase();
-    // const noteFromCouchDB = await db.get(note.id);
-    // let noteToUpdate = createNoteCouchDBFromModel(note);
-    // noteToUpdate._rev = noteFromCouchDB?._rev;
-    // await db.put(noteToUpdate);
-    // await this.addAttachments(note);
-    const cosmosDB = new CosmosDbService();
-    const container = await cosmosDB.getCosmosContainer()
-
-    container.item(note.id, note.id).replace(note);
-
+    const db = this.newService.getDatabase();
+    const noteFromCouchDB = await db.get(note.id);
+    let noteToUpdate = createNoteCouchDBFromModel(note);
+    noteToUpdate._rev = noteFromCouchDB?._rev;
+    await db.put(noteToUpdate);
+    await this.addAttachments(note);
     const found = this.notes.find((noteN) => noteN.id === note.id);
     const index = this.notes.findIndex((noteN) => noteN === found);
     if (index !== -1) this.notes[index] = note;
     this._notes$.next(this.notes as Note[]);
+
+    // Cosmos
+    const cosmosService = new CosmosDbService();
+    cosmosService.updateNote(note);
   }
 
   async getAttachments(

@@ -34,22 +34,6 @@ export class CouchDbWrapperService implements OnDestroy {
     return Promise.resolve();
   }
 
-  public verifyConnection(login: string, password: string): Promise<boolean> {
-    const db = new PouchDB(COUCHDB_DATABASE_LOCAL_URL, {
-      auth: {
-        username: login,
-        password: password,
-      },
-    });
-    return db.put(this.getTestNote()).then(() => {
-      return db.get('test-note').then((doc) => {
-        return db.remove(doc).then(() => {
-          return true;
-        });
-      });
-    });
-  }
-
   public connectToRemoteDb(login: string, password: string): any {
 
     this.serverDb = new PouchDB(COUCHDB_DATABASE_LOCAL_URL, {
@@ -60,17 +44,6 @@ export class CouchDbWrapperService implements OnDestroy {
     });
 
     this.syncDatabases();
-  }
-
-  private getTestNote() {
-    return {
-      _id: 'test-note',
-      title: 'Test',
-      content: 'Test',
-      date: new Date(),
-      favourite: '',
-      color: 'blue',
-    };
   }
 
   private syncDatabases() {

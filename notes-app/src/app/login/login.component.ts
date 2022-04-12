@@ -80,7 +80,6 @@ export class LoginComponent implements OnInit {
     const { database } = await client.databases.createIfNotExists({
       id: databaseId
     })
-    console.log(`Created database:\n${database.id}\n`)
   }
 
 
