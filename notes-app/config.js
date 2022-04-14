@@ -1,18 +1,19 @@
-var config = {}
+var config = {
+    cosmosEndpoint: 'https://cosmosdb-notatki.documents.azure.com:443/',
+    cosmosKey: 'oPFHg7FBGyYqTxVxMxS0iWI4amENMCK9k5nIQygubQrYWaCqb9MylP1Usgg10ljblPJo5TDGPSMaLSBNnRkVxQ==',
+    blobConnectionString: 'DefaultEndpointsProtocol=https;AccountName=notatkistorage;AccountKey=LS5Hf+1piYwdmECeLsh4jK3CES54Pjl37hmAmZ2QLyfwANdtrUr/J42qIhLSHG3FTe5o6ks/I6w7+AStFTAk1A==;EndpointSuffix=core.windows.net',
+    blobContainerName: 'attachements',
+    database: {
+        id: 'notes_app'
+    },
 
-config.endpoint = 'https://cosmosdb-notatki.documents.azure.com:443/'
-config.key = 'oPFHg7FBGyYqTxVxMxS0iWI4amENMCK9k5nIQygubQrYWaCqb9MylP1Usgg10ljblPJo5TDGPSMaLSBNnRkVxQ=='
+    usersContainer: {
+        id: 'users'
+    },
 
-config.database = {
-    id: 'notes_app'
-}
-
-config.usersContainer = {
-    id: 'users'
-}
-
-config.notesContainer = {
-    id: 'notes'
+    notesContainer: {
+        id: 'notes'
+    }
 }
 
 module.exports = config

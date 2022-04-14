@@ -32,15 +32,15 @@ export class LoginComponent implements OnInit {
   async authenticate(): Promise<void> {
     const config = require('../../../config')
 
-    const endpoint = config.endpoint
-    const key = config.key
+    const cosmosEndpoint = config.cosmosEndpoint
+    const cosmosKey = config.cosmosKey
 
     const databaseId = config.database.id
     const containerId = config.usersContainer.id
 
     const options = {
-      endpoint: endpoint,
-      key: key,
+      endpoint: cosmosEndpoint,
+      key: cosmosKey,
       userAgentSuffix: 'CosmosDBJavascriptQuickstart'
     };
 

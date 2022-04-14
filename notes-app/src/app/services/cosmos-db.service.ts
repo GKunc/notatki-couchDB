@@ -8,15 +8,15 @@ import { createNoteModelFromCouchDB, Note } from 'src/models/note';
 export class CosmosDbService {
     async getCosmosContainer(): Promise<Container> {
         const config = require('../../../config')
-        const endpoint = config.endpoint
-        const key = config.key
+        const cosmosEndpoint = config.cosmosEndpoint
+        const cosmosKey = config.cosmosKey
 
         const databaseId = config.database.id
         const containerId = config.notesContainer.id
 
         const options = {
-            endpoint: endpoint,
-            key: key,
+            endpoint: cosmosEndpoint,
+            key: cosmosKey,
             userAgentSuffix: 'CosmosDBNotes'
         };
 

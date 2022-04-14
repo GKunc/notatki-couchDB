@@ -3,11 +3,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
   createNoteCouchDBFromModel,
-  createNoteModelFromCouchDB,
   Note,
 } from 'src/models/note';
 import { CouchDbWrapperService } from './coach-db-wrapper.service';
-import { CosmosClient } from '@azure/cosmos';
 import { CosmosDbService } from './cosmos-db.service';
 
 @Injectable({
