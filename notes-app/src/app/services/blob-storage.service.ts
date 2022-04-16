@@ -1,33 +1,71 @@
 import { Injectable } from '@angular/core';
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { BlobDownloadResponseModel, BlobItem, BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { Attachment } from 'src/models/attachment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class BlobStorageService {
-    async getBlobStorageContainerClient(): Promise<ContainerClient> {
+
+    private async getBlobStorageContainerClient(containerName: string): Promise<ContainerClient> {
         const config = require('../../../config');
-        const blobConnectionString = config.blobConnectionString;
-        const containerName = config.blobContainerName;
-
-        const blobServiceClient = BlobServiceClient.fromConnectionString(
-            blobConnectionString
-        );
-
+        const blobSasUrl = config.blobSasUrl;
+        console.log('fromConnectionString')
+        const blobServiceClient = new BlobServiceClient(blobSasUrl);
+        console.log('fromConnectionString after')
         return blobServiceClient.getContainerClient(containerName);
     }
 
-    async uploadAttachement(attachment: File): Promise<void> {
-        const containerClient = await this.getBlobStorageContainerClient();
-        const blockBlobClient = containerClient.getBlockBlobClient(attachment.name);
-        await blockBlobClient.upload(attachment, attachment.size);
+    async createAttachmentsContainer(noteId: string): Promise<void> {
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        containerClient.create();
     }
 
-    async deleteAttachement(attachment: File): Promise<void> {
-        const containerClient = await this.getBlobStorageContainerClient();
-        const blockBlobClient = containerClient.getBlockBlobClient(attachment.name);
-        await containerClient.deleteBlob(attachment.name);
+    async deleteAttachmentsContainer(noteId: string): Promise<void> {
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        await containerClient.delete();
     }
 
+    async uploadAttachement(noteId: string, attachment: Attachment): Promise<void> {
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        const blockBlobClient = containerClient.getBlockBlobClient(attachment.fileName);
+        await blockBlobClient.upload(attachment.content, attachment.content.size);
+    }
+
+    async deleteAttachement(noteId: string, attachment: Attachment): Promise<void> {
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        await containerClient.deleteBlob(attachment.fileName);
+    }
+
+    async getAttachment(noteId: string, fileName: string): Promise<Blob> {
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        try {
+            const blob = (await containerClient.getBlobClient(fileName).download()).blobBody;
+            if (blob) {
+                return blob;
+            } else {
+                return new Blob();
+            }
+        } catch (error) {
+            alert(`No attachment for note with id: ${noteId} and filename: ${fileName}`)
+            throw new Error(`No attachment for note with id: ${noteId} and filename: ${fileName}`);
+        }
+    }
+
+    async getAttachments(noteId: string): Promise<BlobItem[]> {
+        const attachments = [];
+        const containerClient = await this.getBlobStorageContainerClient(noteId);
+        try {
+            let iter = containerClient.listBlobsFlat();
+            let blobItem = await iter.next();
+            while (!blobItem.done) {
+                attachments.push(blobItem.value)
+                blobItem = await iter.next();
+            }
+        } catch (err: any) {
+            console.log(err.message);
+        }
+        return attachments;
+    }
 }
 

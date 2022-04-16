@@ -1,5 +1,4 @@
 import { Attachment } from './../../models/attachment';
-import { CouchDbService } from './../services/couch-db.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
@@ -7,6 +6,9 @@ import { MdEditorOption } from 'ngx-markdown-editor';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Note } from 'src/models/note';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { BlobStorageService } from '../services/blob-storage.service';
+import { CosmosDbService } from '../services/cosmos-db.service';
+import { NotesService } from '../services/notes.service';
 
 @Component({
   selector: 'app-note-edit',
@@ -28,7 +30,7 @@ export class NoteEditComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<NoteEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { note: Note, isNewNote: boolean },
-    public couchDb: CouchDbService
+    private notesService: NotesService,
   ) {
     this.note = data.note;
     this.isNewNote = data.isNewNote;
@@ -66,7 +68,7 @@ export class NoteEditComponent implements OnInit {
       attachments.push({ fileName: file.name, fileType: file.type, content: file });
     });
     this.note.attachments = attachments;
-    this.couchDb.createNote(this.note);
+    this.notesService.createNote(this.note);
     this.dialogRef.close(true);
   }
 
@@ -87,8 +89,10 @@ export class NoteEditComponent implements OnInit {
       attachments: attachments,
       hashtags: this.note.hashtags
     };
-    await this.couchDb.updateNote(note);
+
     this.dialogRef.close(true);
+    await this.notesService.updateNote(note);
+
   }
 
   closeUpdate(): void {

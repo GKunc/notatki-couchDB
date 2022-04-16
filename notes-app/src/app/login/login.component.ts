@@ -1,9 +1,7 @@
-import { COUCHDB_DATABASE_URL, COUCHDB_DATABASE_LOCAL_URL } from './../consts';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { CouchDbWrapperService } from '../services/coach-db-wrapper.service';
 import { CosmosClient } from '@azure/cosmos';
 import sha256 from 'crypto-js/sha256';
 
@@ -13,13 +11,11 @@ import sha256 from 'crypto-js/sha256';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  remoteDatebase: PouchDB.Database | undefined;
   login = new FormControl('', [Validators.required, Validators.required]);
   password = new FormControl('', [Validators.required, Validators.required]);
   hidePassword = true;
 
   constructor(
-    private couchDbService: CouchDbWrapperService,
     public dialogRef: MatDialogRef<LoginComponent>,
     @Inject(MAT_DIALOG_DATA) public model: any,
     public snackBar: MatSnackBar

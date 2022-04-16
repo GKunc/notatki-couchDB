@@ -21,9 +21,7 @@ import { MarkdownModule } from 'ngx-markdown';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NoteEditComponent } from './note-edit/note-edit.component';
 import { LMarkdownEditorModule } from 'ngx-markdown-editor';
-import { CouchDbWrapperService } from './services/coach-db-wrapper.service';
 import { CookieService } from './services/cookie.service';
-import { CosmosDbService } from './services/cosmos-db.service';
 
 @NgModule({
   declarations: [
@@ -54,13 +52,6 @@ import { CosmosDbService } from './services/cosmos-db.service';
     MatExpansionModule,
   ],
   providers: [
-    CouchDbWrapperService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (cdbs: CouchDbWrapperService) => () => cdbs.init(),
-      deps: [CouchDbWrapperService, CookieService],
-      multi: true,
-    },
   ],
   bootstrap: [AppComponent],
 })

@@ -1,9 +1,9 @@
 import { Attachment } from './../../models/attachment';
 import { Note } from './../../models/note';
 import { NoteEditComponent } from './../note-edit/note-edit.component';
-import { CouchDbService } from './../services/couch-db.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { NotesService } from '../services/notes.service';
 
 @Component({
   selector: 'note',
@@ -23,7 +23,7 @@ export class NoteComponent implements OnInit {
   class: string = '';
   dialogRef: MatDialogRef<NoteEditComponent> | undefined;
 
-  constructor(public couchDb: CouchDbService, public dialog: MatDialog) { }
+  constructor(public notesService: NotesService, public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.class = `note-${this.color}`;
@@ -33,7 +33,6 @@ export class NoteComponent implements OnInit {
     this.favourite = !this.favourite;
 
     const note = this.createCurrentNoteModel();
-    await this.couchDb.updateNote(note);
   }
 
   getFavouriteStyle(): string {
@@ -42,7 +41,7 @@ export class NoteComponent implements OnInit {
   }
 
   async deleteNote(): Promise<void> {
-    await this.couchDb.deleteNote(this.id);
+    await this.notesService.deleteNote(this.id);
   }
 
   async updateNote(): Promise<void> {
@@ -57,11 +56,14 @@ export class NoteComponent implements OnInit {
     this.dialogRef = this.dialog.open(NoteEditComponent, config);
   }
 
-  downloadAttachment(event: any): void {
+  async downloadAttachment(event: any): Promise<void> {
+    console.log("Note ID: " + this.id)
     const clickedAttachment = this.attachments.find(attachment => attachment.fileName === (event.target.innerText as string).split(/\r\n|\n\r|\n|\r/)[0]);
-    if (clickedAttachment) {
-      const data = clickedAttachment?.content;
-      const fileName = clickedAttachment?.fileName;
+    const attachment = await this.notesService.downloadAttachment(this.id, clickedAttachment!.fileName);
+
+    if (attachment) {
+      const data = attachment;
+      const fileName = clickedAttachment!.fileName;
       const a = document.createElement('a');
       document.body.appendChild(a);
       const url = window.URL.createObjectURL(data);
@@ -76,7 +78,7 @@ export class NoteComponent implements OnInit {
   }
 
   removeAttachment(attachment: Attachment): void {
-    this.couchDb.removeAttachment(this.id, attachment);
+    // this.blobStorage.deleteAttachement(this.id, attachment);
     const index = this.attachments.indexOf(attachment);
     if (index >= 0) {
       this.attachments.splice(index, 1);

@@ -13,7 +13,7 @@ app.get('/secrets', async (req, res) => {
     const client = new SecretClient(url, credential);
     const secretName = req.query.name;
     const secret = await client.getSecret(secretName);
-    console.log("Secret: " + secret.value)
+
     res.send(secret.value);
 })
 

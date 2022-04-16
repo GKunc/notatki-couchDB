@@ -1,6 +1,5 @@
 import { NoteEditComponent } from './../note-edit/note-edit.component';
 import { CookieService } from './../services/cookie.service';
-import { CouchDbService } from './../services/couch-db.service';
 import { LoginComponent } from './../login/login.component';
 import { Component, OnInit } from '@angular/core';
 import {
@@ -11,6 +10,7 @@ import {
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { Note } from 'src/models/note';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { NotesService } from '../services/notes.service';
 
 @Component({
   selector: 'app-board',
@@ -30,10 +30,10 @@ export class BoardComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    public couchDb: CouchDbService,
-    private cookieService: CookieService
+    public notesService: NotesService,
+    private cookieService: CookieService,
   ) {
-    this.couchDb.notes$.subscribe((notes) => {
+    this.notesService.notes$.subscribe((notes: any) => {
       this.notes = notes;
       this.filterNotes();
     });
@@ -43,7 +43,7 @@ export class BoardComponent implements OnInit {
     if (this.cookieService.getCookie('Authenticated') === 'true') {
       this.authenticated = true;
       this.loading = false;
-      await this.couchDb.getAllNotes();
+      await this.notesService.getAllNotes();
     } else {
       this.loginDialogRef = this.dialog.open(LoginComponent, {});
       const config: MatSnackBarConfig = {
@@ -56,7 +56,7 @@ export class BoardComponent implements OnInit {
           config.panelClass = ['success-notification'];
           this.loading = false;
           this.snackBar.open('Succesfully logged in!', 'Dismiss', config);
-          await this.couchDb.getAllNotes();
+          await this.notesService.getAllNotes();
         }
       });
     }

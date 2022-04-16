@@ -12,7 +12,7 @@ export class Note {
   hashtags: string[] = [];
 }
 
-export function createNoteModelFromCouchDB(note: Note & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta | undefined): Note {
+export function createNoteModelFromCouchDB(note: Note | undefined): Note {
   return {
     id: note?.id ?? 'empty',
     title: note?.title ?? '',
