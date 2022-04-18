@@ -49,8 +49,6 @@ export class CosmosDbService {
         const container = await cosmosDB.getCosmosContainer()
 
         container.items.create(note);
-        console.log(note)
-        // await this.addAttachments(note);
     }
 
     async deleteNote(noteId: string): Promise<void> {
@@ -61,7 +59,7 @@ export class CosmosDbService {
 
     async updateNote(note: Note): Promise<void> {
         const cosmosDB = new CosmosDbService();
-        const container = await cosmosDB.getCosmosContainer()
+        const container = await cosmosDB.getCosmosContainer();
         container.item(note.id, note.id).replace(note);
     }
 }

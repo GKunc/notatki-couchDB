@@ -57,7 +57,6 @@ export class NoteComponent implements OnInit {
   }
 
   async downloadAttachment(event: any): Promise<void> {
-    console.log("Note ID: " + this.id)
     const clickedAttachment = this.attachments.find(attachment => attachment.fileName === (event.target.innerText as string).split(/\r\n|\n\r|\n|\r/)[0]);
     const attachment = await this.notesService.downloadAttachment(this.id, clickedAttachment!.fileName);
 
@@ -77,12 +76,12 @@ export class NoteComponent implements OnInit {
     }
   }
 
-  removeAttachment(attachment: Attachment): void {
-    // this.blobStorage.deleteAttachement(this.id, attachment);
+  async removeAttachment(attachment: Attachment): Promise<void> {
     const index = this.attachments.indexOf(attachment);
     if (index >= 0) {
       this.attachments.splice(index, 1);
     }
+    await this.notesService.deleteAttachment(this.createCurrentNoteModel(), attachment.fileName);
   }
 
   private createCurrentNoteModel(): Note {

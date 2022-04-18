@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Note } from 'src/models/note';
 import { CosmosDbService } from './cosmos-db.service';
 import { BlobStorageService } from './blob-storage.service';
-import { BlobItem } from '@azure/storage-blob';
 
 @Injectable({
     providedIn: 'root',
@@ -49,14 +48,19 @@ export class NotesService {
     }
 
     async updateNote(note: Note): Promise<void> {
-        const found = this.notes.find((noteN) => noteN.id === note.id);
-        const index = this.notes.findIndex((noteN) => noteN === found);
-        if (index !== -1) this.notes[index] = note;
+        const index = this.notes.findIndex((noteN) => noteN.id === note.id);
+        if (index !== -1) {
+            this.notes[index] = note;
+        }
         this._notes$.next(this.notes as Note[]);
 
         await this.cosmosDbService.updateNote(note);
-        // upadate attachments
-        // await this.addAttachments(note);
+        await this.blobStorageService.updateAttachmets(note);
+    }
+
+    async deleteAttachment(note: Note, attachmentName: string): Promise<void> {
+        await this.cosmosDbService.updateNote(note);
+        await this.blobStorageService.deleteAttachement(note.id, attachmentName);
     }
 
     async downloadAttachment(noteId: string, fileName: string): Promise<Blob> {

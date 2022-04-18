@@ -6,8 +6,6 @@ import { MdEditorOption } from 'ngx-markdown-editor';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Note } from 'src/models/note';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { BlobStorageService } from '../services/blob-storage.service';
-import { CosmosDbService } from '../services/cosmos-db.service';
 import { NotesService } from '../services/notes.service';
 
 @Component({
@@ -92,7 +90,6 @@ export class NoteEditComponent implements OnInit {
 
     this.dialogRef.close(true);
     await this.notesService.updateNote(note);
-
   }
 
   closeUpdate(): void {
