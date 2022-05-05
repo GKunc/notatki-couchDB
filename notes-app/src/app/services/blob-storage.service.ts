@@ -26,9 +26,13 @@ export class BlobStorageService {
     }
 
     async uploadAttachement(noteId: string, attachment: Attachment): Promise<void> {
+
+        const start = new Date().getTime();
         const containerClient = await this.getBlobStorageContainerClient(noteId);
         const blockBlobClient = containerClient.getBlockBlobClient(attachment.fileName);
         await blockBlobClient.uploadData(attachment.content);
+        const duration = new Date().getTime() - start;
+        console.log("UPLOAD TIMEL: " + duration / 1000)
     }
 
     async updateAttachmets(note: Note): Promise<void> {

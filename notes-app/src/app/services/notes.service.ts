@@ -33,10 +33,10 @@ export class NotesService {
 
         uploadPromises.push(this.cosmosDbService.createNote(note));
         await this.blobStorageService.createAttachmentsContainer(note.id);
-        note.attachments.forEach(attachment => {
-            uploadPromises.push(this.blobStorageService.uploadAttachement(note.id, attachment));
-        });
-        Promise.all(uploadPromises);
+        for (let i = 0; i < note.attachments.length; i++) {
+            const attachment = note.attachments[i]
+            await this.blobStorageService.uploadAttachement(note.id, attachment);
+        }
     }
 
     async deleteNote(noteId: string): Promise<void> {
