@@ -57,12 +57,14 @@ export class NoteComponent implements OnInit {
   }
 
   async downloadAttachment(event: any): Promise<void> {
-    const clickedAttachment = this.attachments.find(attachment => attachment.fileName === (event.target.innerText as string).split(/\r\n|\n\r|\n|\r/)[0]);
-    const attachment = await this.notesService.downloadAttachment(this.id, clickedAttachment!.fileName);
+    const clickedFileName = this.getAttachmentName(event.target).trim();
+    console.log(` .${clickedFileName}. `)
+    console.log(this.attachments)
+    const attachment = await this.notesService.downloadAttachment(this.id, clickedFileName);
 
     if (attachment) {
       const data = attachment;
-      const fileName = clickedAttachment!.fileName;
+      const fileName = clickedFileName;
       const a = document.createElement('a');
       document.body.appendChild(a);
       const url = window.URL.createObjectURL(data);
@@ -95,5 +97,19 @@ export class NoteComponent implements OnInit {
       attachments: this.attachments,
       hashtags: this.hashtags
     };
+  }
+
+  private getAttachmentName(el: any): string {
+    let child = el.firstChild,
+      texts = [];
+
+    while (child) {
+      if (child.nodeType == 3) {
+        texts.push(child.data);
+      }
+      child = child.nextSibling;
+    }
+
+    return texts.join("");
   }
 }
